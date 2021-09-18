@@ -1,9 +1,19 @@
-var http = require('http');//nodeが用意しているhttpモジュールの読み込み
-var server = http.createServer();//http.createServerを使う
-server.on('request',function(req, res){//onで飛んでくるイベントを結びつける。reqが入ったらresを返す。
-  res.writeHead(200,{'Content-Type': 'text/plain'});//httpで渡して成功したら（200番）で'Content-Type': 'text/plain'を返す
-  res.write('hello world');//nodeがhello worldを表示
-  res.end();//レスポンス終了
+var http = require('http'),
+fs = require('fs');
+var settings = require('./settings.js');
+var server = http.createServer();
+var msg;
+server.on('request',function(req, res){
+  fs.readFile(__dirname + '/public_html/hello.html', 'utf-8', function(err, data) {
+    if(err){
+      res.writeHead(404,{'Content-Type': 'text/plain'});
+      res.write("not found!");
+      return res.end();
+    }
+    res.writeHead(200,{'Content-Type': 'text/html'});
+    res.write(data);
+    res.end();
+  });
 });
-server.listen(3306,'192.168.128.101')//待ち受け状態にして、ポート番号とIPアドレス
-console.log("server listening")//サーバーが待ち受け"server listening"だと表示
+server.listen(settings.port, settings.host);
+console.log("server listening");
